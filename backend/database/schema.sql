@@ -12,7 +12,6 @@ CREATE TABLE proctor (
     name VARCHAR(255),
     email VARCHAR(255) UNIQUE,
     password VARCHAR(255),
-    exam_id INT REFERENCES exam(exam_id)
 );
 
 -- Table: Question
@@ -33,6 +32,7 @@ CREATE TABLE exam (
     title VARCHAR(255),
     subject VARCHAR(255),
     question_id INT REFERENCES question(question_id),
+    proctor_id INT REFERENCES proctor(proctor_id),
     duration INT
 );
 

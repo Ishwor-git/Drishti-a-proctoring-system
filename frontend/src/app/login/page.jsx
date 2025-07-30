@@ -12,11 +12,13 @@ import {
   FormControl,
   FormLabel,
 } from "@mui/material";
+import axios from "axios";
+import { useRouter } from "next/navigation";
 
 const Login = () => {
   const [role, setRole] = useState("attendee");
   const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const [password, setPassword] = useState("")
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -29,6 +31,25 @@ const Login = () => {
   const handleSignUpClick = () => {
     // Navigate to your sign up page
     window.location.href = "/signup"; // Change to your actual signup route
+  const [message, setMessage] = useState("");
+  const router = useRouter();
+
+  const handleLogin = async (email, password) => {
+    try {
+      const responce = await axios.post(
+        "http://localhost:8000/api/auth/signin",
+        { email, password }
+      );
+      router.push("/");
+    } catch (e) {
+      setMessage(e.response.data.detail);
+      console.error("Login Failed", e.response.data.detail);
+    }
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    await handleLogin(email, password);
   };
 
   return (
@@ -70,6 +91,18 @@ const Login = () => {
           {`Your smart proctoring and exam management solution.
             Log in to access your dashboard and manage exams.`}
         </Typography>
+        <form onSubmit={handleSubmit}>
+          <Box mb={2}>
+            <TextField
+              label="Email"
+              fullWidth
+              variant="outlined"
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+            />
+          </Box>
 
 
         <form onSubmit={handleSubmit} noValidate>
@@ -164,6 +197,18 @@ const Login = () => {
         >
           Sign Up
         </Button>
+          {message && (
+            <Typography color="error" align="center" mt={2}>
+              {message}
+            </Typography>
+          )}
+          <Typography color="secondary" mt={1}>
+            <Link href="/reset-password">Forgot Password? </Link>
+          </Typography>
+          <Typography color="secondary" align="center" mt={2}>
+            Don't have an account ? <Link href="/signup">Sign UP</Link>
+          </Typography>
+        </form>
       </Paper>
     </Box>
   );

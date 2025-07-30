@@ -11,6 +11,9 @@ import {
   Link,
   Alert,
 } from "@mui/material";
+import React, { useState } from "react";
+import { useRouter } from "next/navigation";
+import axios from "axios";
 
 const Signup = () => {
   const [name, setName] = useState("");
@@ -52,6 +55,30 @@ const Signup = () => {
       setPassword("");
       setConfirmPassword("");
     }, 1500);
+  const router = useRouter();
+
+  const handleSignup = async (name_, email_, password_) => {
+    try {
+      const responce = await axios.post(
+        "http://localhost:8000/api/auth/signup",
+        { name, email, password }
+      );
+      router.push("/login");
+    } catch (e) {
+      setMessage(e.response.data.detail);
+      console.error("Login Failed", e.response.data.detail);
+    }
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (password.length < 6) {
+      setMessage("too short password");
+    } else if (password != confirmPassword) {
+      setMessage("passwords do not match");
+    } else {
+      await handleSignup(name, email, password);
+    }
   };
 
   return (
@@ -85,6 +112,7 @@ const Signup = () => {
             Join DRISTHI — smart proctoring and exam management platform.
           </Typography>
           <form onSubmit={handleSignup} noValidate>
+          <form onSubmit={handleSubmit}>
             <Box mb={2}>
               <TextField
                 label="Full Name"
@@ -182,6 +210,16 @@ const Signup = () => {
               {message}
             </Alert>
           )}
+            {message && (
+              <Typography color="error" mt={2} textAlign="center">
+                {message}
+              </Typography>
+            )}
+
+            <Typography align="center" mt={2}>
+              Already have an account? <Link href="/login">Log In</Link>
+            </Typography>
+          </form>
         </Paper>
       </Container>
     </Box>
